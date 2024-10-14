@@ -65,7 +65,8 @@ function Header() {
 }
 
 function Logo() {
-    return new Element('img', {className: 'logo', src: 'https://placehold.it/100x100'})
+    /*return new Element('img', {className: 'logo', src: 'https://placehold.it/100x100'})*/
+    return ""
 }
 
 function Clock({time}) {
@@ -218,19 +219,19 @@ function sync(virtualNode, realNode) {
         }
 
         //update
-        if (virtual !== undefined && real !== undefined && virtual.tagName === real.tagName ) {
+        if (virtual !== undefined && real !== undefined && virtual.tagName === real.tagName) {
             sync(virtual, real)
         }
 
         // replace
-        if (virtual !== undefined && real !== undefined && virtual.tagName !== real.tagName ) {
+        if (virtual !== undefined && real !== undefined && virtual.tagName !== real.tagName) {
             const newReal = createRealNodeByVirtual(virtual)
             sync(virtual, newReal)
             realNode.replaceChild(newReal, real)
         }
 
         // add
-        if (virtual !== undefined && real === undefined ) {
+        if (virtual !== undefined && real === undefined) {
             const newReal = createRealNodeByVirtual(virtual)
             sync(virtual, newReal)
             realNode.appendChild(newReal)
@@ -240,11 +241,8 @@ function sync(virtualNode, realNode) {
 }
 
 function createRealNodeByVirtual(virtual) {
-    let newReal
     if (virtual.nodeType === Node.TEXT_NODE) {
-        newReal = document.createTextNode('')
-    } else {
-        newReal = document.createElement(virtual.tagName)
+        return document.createTextNode('')
     }
-    return newReal
+    return document.createElement(virtual.tagName)
 }
