@@ -1,0 +1,28 @@
+.app {
+    max-width: 500px;
+}
+
+.clock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.clock .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 15px;
+}
+
+.clock .icon.day {
+    background-color: orange;
+}
+
+.clock .icon.night {
+    background-color: blue;
+}
+
