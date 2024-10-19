@@ -107,7 +107,7 @@ function Logo() {
         type: "img",
         props: {
             className: 'logo',
-            src: 'https://placehold.it/100x100',
+            src: 'http://via.placeholder.com/100x100',
         }
     }
 }
@@ -284,7 +284,7 @@ function render(virtualDom, realDomRoot) {
             id: realDomRoot.id,
             ...realDomRoot.attributes,
             children: [
-                virtualDom,
+                evaluatedVirtualDom,
             ],
         }
     };
@@ -295,26 +295,26 @@ function render(virtualDom, realDomRoot) {
 
 
 function sync(virtualNode, realNode) {
-    if (virtualNode.id !== realNode.id) {
-        realNode.id = virtualNode.id
-    }
-    if (virtualNode.className !== realNode.className) {
-        realNode.className = virtualNode.className
-    }
+    if (virtualNode.props) {
+        Object.entries(virtualNode.props).forEach(([name, value]) => {
+            if (name === 'children' || name === 'key') {
+                return
+            }
 
-    if (virtualNode.attributes) {
-        Array.from(virtualNode.attributes).forEach((attr) => {
-            if (realNode[attr.name] !== attr.value) {
-                realNode[attr.name] = attr.value
+            if (realNode[name] !== value) {
+                realNode[name] = value
             }
         })
     }
 
-    if (virtualNode.nodeValue !== realNode.nodeValue) {
-        realNode.nodeValue = virtualNode.nodeValue
+    if (virtualNode.key) {
+        realNode.dataset.key = virtualNode.key;
+    }
+    if (typeof virtualNode !== 'object' && virtualNode !== realNode.nodeValue) {
+        realNode.nodeValue = virtualNode
     }
 
-    const virtualChildren = virtualNode.childNodes;
+    const virtualChildren = virtualNode.props ? virtualNode.props.children || [] : []
     const realChildren = realNode.childNodes;
 
     for (let i = 0; i < Math.max(virtualChildren.length, realChildren.length); i++) {
@@ -322,17 +322,21 @@ function sync(virtualNode, realNode) {
         const real = realChildren[i]
 
         // remove
-        if (virtual === undefined && real !== undefined ) {
+        if (virtual === undefined && real !== undefined) {
             realNode.remove(real)
         }
 
         //update
-        if (virtual !== undefined && real !== undefined && virtual.tagName === real.tagName) {
+        if (virtual !== undefined
+            && real !== undefined
+            && (virtual.type || '') === (real.tagName || '').toLowerCase()) {
             sync(virtual, real)
         }
 
         // replace
-        if (virtual !== undefined && real !== undefined && virtual.tagName !== real.tagName) {
+        if (virtual !== undefined
+            && real !== undefined
+            && (virtual.type || '') !== (real.tagName || '').toLowerCase()) {
             const newReal = createRealNodeByVirtual(virtual)
             sync(virtual, newReal)
             realNode.replaceChild(newReal, real)
@@ -345,12 +349,11 @@ function sync(virtualNode, realNode) {
             realNode.appendChild(newReal)
         }
     }
-
 }
 
 function createRealNodeByVirtual(virtual) {
-    if (virtual.nodeType === Node.TEXT_NODE) {
+    if (typeof virtual !== 'object') {
         return document.createTextNode('')
     }
-    return document.createElement(virtual.tagName)
+    return document.createElement(virtual.type)
 }
