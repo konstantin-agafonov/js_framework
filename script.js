@@ -49,36 +49,15 @@ let state = {
 }
 
 function App({state}) {
-    return {
-        type: 'div',
-        props: {
-            className: 'app',
-            children: [
-                {
-                    type: Header,
-                    props: {},
-                },
-                {
-                    type: Clock,
-                    props: { time: state.time },
-                },
-                {
-                    type: Lots,
-                    props: { lots: state.lots },
-                },
-            ],
-        },
-    }
+    return VDom.createElement('div', { className: 'app' },
+        VDom.createElement(Header),
+        VDom.createElement(Clock, { time: state.time }),
+        VDom.createElement(Lots, { lots: state.lots }),
+    );
 }
 
 function Block(props) {
-    return {
-        type: 'div',
-        props: {
-            className: 'block',
-            children: props.children,
-        },
-    }
+    return VDom.createElement('div', { className: 'block' }, props.children);
 }
 
 function Header() {
@@ -98,98 +77,35 @@ function Logo() {
 
 function Clock({time}) {
     const isDay = time.getHours() >= 7 && time.getHours() <= 21;
-    return {
-        type: 'div',
-        props: {
-            className: 'clock',
-            children: [
-                {
-                    type: 'span',
-                    props: {
-                        className: 'value',
-                        children: [
-                            time.toLocaleTimeString(),
-                        ]
-                    }
-                },
-                {
-                    type: 'span',
-                    props: {
-                        className: `icon ${isDay ? 'day' : 'night'}`,
-                    }
-                },
-            ]
-        }
-    }
+    return VDom.createElement('div', { className: 'clock' },
+        VDom.createElement('span', { className: 'value' }, time.toLocaleTimeString()),
+        VDom.createElement('span', { className: `icon ${isDay ? 'day' : 'night'}` })
+    );
 }
 
 function Loading() {
-    return {
-        type: 'div',
-        props: {
-            className: 'loading',
-            children: [
-                'Loading...',
-            ]
-        }
-    }
+    return VDom.createElement('div', { className: 'loading' }, 'Loading...')
 }
 
 function Lots({lots}) {
     if (lots === null) {
-        return {
-            type: Loading,
-            props: {},
-        }
+        return VDom.createElement(Loading)
     }
 
-    return {
-        type: 'div',
-        props: {
-            className: 'lots',
-            children: lots.map((lot) => ({
-                type: Lot,
-                props: { lot },
-            })),
-        }
-    }
+    return VDom.createElement('div', { className: 'lots' }, lots.map((lot) =>
+        VDom.createElement(Lot, {lot, key: lot.id})
+    ))
 }
 
-function Lot({lot}) {
-    return {
-        type: 'article',
-        key: lot.id,
-        props: {
+function Lot({ lot, key }) {
+    return VDom.createElement('article', {
             className: 'lot',
-            children: [
-                {
-                    type: 'h1',
-                    props: {
-                        children: [
-                            lot.name
-                        ]
-                    },
-                },
-                {
-                    type: 'p',
-                    props: {
-                        children: [
-                            lot.desc
-                        ]
-                    },
-                },
-                {
-                    type: 'div',
-                    props: {
-                        className: 'price',
-                        children: [
-                            lot.price
-                        ]
-                    },
-                },
-            ]
-        }
-    }
+            key,
+        },
+        VDom.createElement('h1', {}, lot.name),
+        VDom.createElement('p', {}, lot.desc),
+        VDom.createElement('div', { className: 'price' }, lot.price)
+    )
 }
 
 const VDom = {
@@ -213,7 +129,7 @@ const VDom = {
 
 function renderApp(state) {
     render(
-        App({state}),
+        VDom.createElement(App, { state }),
         document.querySelector('#root')
     )
 }
