@@ -82,34 +82,18 @@ function Block(props) {
 }
 
 function Header() {
-    return {
-        type: 'header',
-        props: {
-            className: 'header',
-            children: [
-                {
-                    type: Block,
-                    props: {
-                        children: [
-                            {
-                                type: Logo,
-                            }
-                        ]
-                    }
-                },
-            ],
-        },
-    }
+    return VDom.createElement(
+        'header',
+        {className: 'header'},
+        VDom.createElement(Block, {},VDom.createElement(Logo))
+    );
 }
 
 function Logo() {
-    return {
-        type: "img",
-        props: {
-            className: 'logo',
-            src: 'http://via.placeholder.com/100x100',
-        }
-    }
+    return VDom.createElement('img', {
+        className: 'logo',
+        src: 'http://via.placeholder.com/100x100',
+    });
 }
 
 function Clock({time}) {
@@ -204,6 +188,25 @@ function Lot({lot}) {
                     },
                 },
             ]
+        }
+    }
+}
+
+const VDom = {
+    createElement: (type, config, ...children) => {
+        const key = config ? (config.key || null) : null
+        const props = config || {}
+
+        if (children.length === 1) {
+            props.children = children[0]
+        } else {
+            props.children = children
+        }
+
+        return {
+            type,
+            key,
+            props,
         }
     }
 }
